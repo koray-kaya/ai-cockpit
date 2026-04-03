@@ -1,10 +1,10 @@
-import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core";
+import { pgTable, text, integer, real, serial } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // Phases (0-4)
-export const phases = sqliteTable("phases", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const phases = pgTable("phases", {
+  id: serial("id").primaryKey(),
   phaseNumber: integer("phase_number").notNull(),
   name: text("name").notNull(),
   description: text("description").notNull(),
@@ -20,8 +20,8 @@ export type InsertPhase = z.infer<typeof insertPhaseSchema>;
 export type Phase = typeof phases.$inferSelect;
 
 // Bootcamp Days (1-6)
-export const bootcampDays = sqliteTable("bootcamp_days", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const bootcampDays = pgTable("bootcamp_days", {
+  id: serial("id").primaryKey(),
   dayNumber: integer("day_number").notNull(),
   date: text("date").notNull(),
   theme: text("theme").notNull(),
@@ -36,8 +36,8 @@ export type InsertBootcampDay = z.infer<typeof insertBootcampDaySchema>;
 export type BootcampDay = typeof bootcampDays.$inferSelect;
 
 // Skills
-export const skills = sqliteTable("skills", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const skills = pgTable("skills", {
+  id: serial("id").primaryKey(),
   name: text("name").notNull(),
   category: text("category").notNull(),
   currentLevel: integer("current_level").notNull().default(0),
@@ -50,8 +50,8 @@ export type InsertSkill = z.infer<typeof insertSkillSchema>;
 export type Skill = typeof skills.$inferSelect;
 
 // Journal Entries
-export const journalEntries = sqliteTable("journal_entries", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const journalEntries = pgTable("journal_entries", {
+  id: serial("id").primaryKey(),
   date: text("date").notNull(),
   learned: text("learned").notNull(),
   struggled: text("struggled").notNull(),
@@ -72,8 +72,8 @@ export type InsertJournalEntry = z.infer<typeof insertJournalEntrySchema>;
 export type JournalEntry = typeof journalEntries.$inferSelect;
 
 // Visibility Metrics (weekly logs)
-export const visibilityLogs = sqliteTable("visibility_logs", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const visibilityLogs = pgTable("visibility_logs", {
+  id: serial("id").primaryKey(),
   weekOf: text("week_of").notNull(),
   githubCommits: integer("github_commits").notNull().default(0),
   githubRepos: integer("github_repos").notNull().default(0),
@@ -92,8 +92,8 @@ export type InsertVisibilityLog = z.infer<typeof insertVisibilityLogSchema>;
 export type VisibilityLog = typeof visibilityLogs.$inferSelect;
 
 // Resources
-export const resources = sqliteTable("resources", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const resources = pgTable("resources", {
+  id: serial("id").primaryKey(),
   name: text("name").notNull(),
   url: text("url").notNull(),
   platform: text("platform").notNull(),

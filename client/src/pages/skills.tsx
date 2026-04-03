@@ -5,6 +5,10 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Plus, Trash2, TrendingUp } from "lucide-react";
 import type { Skill } from "@shared/schema";
 import { useState } from "react";
 
@@ -64,10 +68,36 @@ export default function Skills() {
 
   const [filter, setFilter] = useState("All");
 
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [newSkillName, setNewSkillName] = useState("");
+  const [newSkillCategory, setNewSkillCategory] = useState("ML / AI");
+  const [newSkillTarget, setNewSkillTarget] = useState(4);
+
   const updateMutation = useMutation({
     mutationFn: async ({ id, data }: { id: number; data: Partial<Skill> }) => {
       const res = await apiRequest("PATCH", `/api/skills/${id}`, data);
       return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/skills"] });
+    },
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (data: { name: string; category: string; currentLevel: number; targetLevel: number; status: string }) => {
+      const res = await apiRequest("POST", "/api/skills", data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/skills"] });
+      setNewSkillName("");
+      setShowAddForm(false);
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest("DELETE", `/api/skills/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/skills"] });
@@ -112,6 +142,65 @@ export default function Skills() {
         <div className="flex items-center gap-3">
           <span className="text-sm font-mono">{overallPercent}% complete</span>
           <Progress value={overallPercent} className="h-2 w-24" />
+          <Dialog open={showAddForm} onOpenChange={setShowAddForm}>
+            <DialogTrigger asChild>
+              <Button size="sm" variant="outline" className="gap-1" data-testid="btn-add-skill">
+                <Plus className="h-3.5 w-3.5" /> Add Skill
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-4 w-4 text-primary" />
+                  Add New Skill
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-2">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Skill Name</label>
+                  <Input
+                    placeholder="e.g. Agentic AI, RLHF, Graph Neural Networks..."
+                    value={newSkillName}
+                    onChange={(e) => setNewSkillName(e.target.value)}
+                    data-testid="input-skill-name"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Category</label>
+                  <Select value={newSkillCategory} onValueChange={setNewSkillCategory}>
+                    <SelectTrigger data-testid="select-skill-category">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.filter(c => c !== "All").map(c => (
+                        <SelectItem key={c} value={c}>{c}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Target Level (0-5)</label>
+                  <LevelSelector currentLevel={newSkillTarget} onSelect={setNewSkillTarget} />
+                </div>
+                <Button
+                  className="w-full"
+                  disabled={!newSkillName.trim() || createMutation.isPending}
+                  onClick={() => {
+                    createMutation.mutate({
+                      name: newSkillName.trim(),
+                      category: newSkillCategory,
+                      currentLevel: 0,
+                      targetLevel: newSkillTarget,
+                      status: "not_started",
+                    });
+                  }}
+                  data-testid="btn-save-skill"
+                >
+                  {createMutation.isPending ? "Adding..." : "Add Skill"}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 
@@ -146,6 +235,7 @@ export default function Skills() {
                 <th className="p-3 font-semibold text-xs uppercase tracking-wider text-muted-foreground">Level</th>
                 <th className="p-3 font-semibold text-xs uppercase tracking-wider text-muted-foreground">Target</th>
                 <th className="p-3 font-semibold text-xs uppercase tracking-wider text-muted-foreground">Status</th>
+                <th className="p-3 w-10"></th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border/30">
@@ -183,6 +273,19 @@ export default function Skills() {
                         ))}
                       </SelectContent>
                     </Select>
+                  </td>
+                  <td className="p-2">
+                    <button
+                      onClick={() => {
+                        if (confirm(`Remove "${skill.name}" from tracking?`)) {
+                          deleteMutation.mutate(skill.id);
+                        }
+                      }}
+                      className="text-muted-foreground hover:text-destructive transition-colors p-1 rounded"
+                      data-testid={`delete-skill-${skill.id}`}
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
                   </td>
                 </tr>
               ))}

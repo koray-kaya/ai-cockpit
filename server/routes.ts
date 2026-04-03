@@ -4,94 +4,104 @@ import { storage } from "./storage";
 
 export async function registerRoutes(server: Server, app: Express) {
   // ─── Phases ───
-  app.get("/api/phases", (_req, res) => {
-    res.json(storage.getPhases());
+  app.get("/api/phases", async (_req, res) => {
+    res.json(await storage.getPhases());
   });
 
-  app.get("/api/phases/:id", (req, res) => {
-    const phase = storage.getPhase(Number(req.params.id));
+  app.get("/api/phases/:id", async (req, res) => {
+    const phase = await storage.getPhase(Number(req.params.id));
     if (!phase) return res.status(404).json({ error: "Phase not found" });
     res.json(phase);
   });
 
   // ─── Bootcamp ───
-  app.get("/api/bootcamp", (_req, res) => {
-    res.json(storage.getBootcampDays());
+  app.get("/api/bootcamp", async (_req, res) => {
+    res.json(await storage.getBootcampDays());
   });
 
-  app.patch("/api/bootcamp/:id", (req, res) => {
-    const updated = storage.updateBootcampDay(Number(req.params.id), req.body);
+  app.patch("/api/bootcamp/:id", async (req, res) => {
+    const updated = await storage.updateBootcampDay(Number(req.params.id), req.body);
     if (!updated) return res.status(404).json({ error: "Day not found" });
     res.json(updated);
   });
 
   // ─── Skills ───
-  app.get("/api/skills", (_req, res) => {
-    res.json(storage.getSkills());
+  app.get("/api/skills", async (_req, res) => {
+    res.json(await storage.getSkills());
   });
 
-  app.patch("/api/skills/:id", (req, res) => {
-    const updated = storage.updateSkill(Number(req.params.id), req.body);
+  app.post("/api/skills", async (req, res) => {
+    const skill = await storage.createSkill(req.body);
+    res.status(201).json(skill);
+  });
+
+  app.patch("/api/skills/:id", async (req, res) => {
+    const updated = await storage.updateSkill(Number(req.params.id), req.body);
     if (!updated) return res.status(404).json({ error: "Skill not found" });
     res.json(updated);
   });
 
-  // ─── Journal ───
-  app.get("/api/journal", (_req, res) => {
-    res.json(storage.getJournalEntries());
+  app.delete("/api/skills/:id", async (req, res) => {
+    await storage.deleteSkill(Number(req.params.id));
+    res.status(204).send();
   });
 
-  app.post("/api/journal", (req, res) => {
-    const entry = storage.createJournalEntry(req.body);
+  // ─── Journal ───
+  app.get("/api/journal", async (_req, res) => {
+    res.json(await storage.getJournalEntries());
+  });
+
+  app.post("/api/journal", async (req, res) => {
+    const entry = await storage.createJournalEntry(req.body);
     res.status(201).json(entry);
   });
 
-  app.patch("/api/journal/:id", (req, res) => {
-    const updated = storage.updateJournalEntry(Number(req.params.id), req.body);
+  app.patch("/api/journal/:id", async (req, res) => {
+    const updated = await storage.updateJournalEntry(Number(req.params.id), req.body);
     if (!updated) return res.status(404).json({ error: "Entry not found" });
     res.json(updated);
   });
 
-  app.delete("/api/journal/:id", (req, res) => {
-    storage.deleteJournalEntry(Number(req.params.id));
+  app.delete("/api/journal/:id", async (req, res) => {
+    await storage.deleteJournalEntry(Number(req.params.id));
     res.status(204).send();
   });
 
   // ─── Visibility ───
-  app.get("/api/visibility", (_req, res) => {
-    res.json(storage.getVisibilityLogs());
+  app.get("/api/visibility", async (_req, res) => {
+    res.json(await storage.getVisibilityLogs());
   });
 
-  app.post("/api/visibility", (req, res) => {
-    const log = storage.createVisibilityLog(req.body);
+  app.post("/api/visibility", async (req, res) => {
+    const log = await storage.createVisibilityLog(req.body);
     res.status(201).json(log);
   });
 
-  app.patch("/api/visibility/:id", (req, res) => {
-    const updated = storage.updateVisibilityLog(Number(req.params.id), req.body);
+  app.patch("/api/visibility/:id", async (req, res) => {
+    const updated = await storage.updateVisibilityLog(Number(req.params.id), req.body);
     if (!updated) return res.status(404).json({ error: "Log not found" });
     res.json(updated);
   });
 
   // ─── Resources ───
-  app.get("/api/resources", (_req, res) => {
-    res.json(storage.getResources());
+  app.get("/api/resources", async (_req, res) => {
+    res.json(await storage.getResources());
   });
 
-  app.patch("/api/resources/:id", (req, res) => {
-    const updated = storage.updateResource(Number(req.params.id), req.body);
+  app.patch("/api/resources/:id", async (req, res) => {
+    const updated = await storage.updateResource(Number(req.params.id), req.body);
     if (!updated) return res.status(404).json({ error: "Resource not found" });
     res.json(updated);
   });
 
   // ─── Dashboard Summary ───
-  app.get("/api/dashboard", (_req, res) => {
-    const allSkills = storage.getSkills();
-    const allJournal = storage.getJournalEntries();
-    const allPhases = storage.getPhases();
-    const allBootcamp = storage.getBootcampDays();
-    const allResources = storage.getResources();
-    const allVisibility = storage.getVisibilityLogs();
+  app.get("/api/dashboard", async (_req, res) => {
+    const allSkills = await storage.getSkills();
+    const allJournal = await storage.getJournalEntries();
+    const allPhases = await storage.getPhases();
+    const allBootcamp = await storage.getBootcampDays();
+    const allResources = await storage.getResources();
+    const allVisibility = await storage.getVisibilityLogs();
 
     // Calculate day number from April 3 2026
     const startDate = new Date("2026-04-03");
