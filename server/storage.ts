@@ -6,7 +6,7 @@ import type {
   InsertJournalEntry, JournalEntry,
   InsertVisibilityLog, VisibilityLog,
   InsertResource, Resource,
-} from "@shared/schema";
+} from "../shared/schema";
 
 const supabaseUrl = process.env.SUPABASE_URL!;
 const supabaseKey = process.env.SUPABASE_ANON_KEY!;
