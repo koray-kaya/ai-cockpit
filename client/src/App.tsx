@@ -8,24 +8,16 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider, ThemeToggle } from "@/components/theme-provider";
 import Dashboard from "@/pages/dashboard";
-import Bootcamp from "@/pages/bootcamp";
-import Roadmap from "@/pages/roadmap";
 import Skills from "@/pages/skills";
 import Journal from "@/pages/journal";
-import Visibility from "@/pages/visibility";
-import Resources from "@/pages/resources";
 import NotFound from "@/pages/not-found";
 
 function AppRouter() {
   return (
     <Switch>
       <Route path="/" component={Dashboard} />
-      <Route path="/bootcamp" component={Bootcamp} />
-      <Route path="/roadmap" component={Roadmap} />
       <Route path="/skills" component={Skills} />
       <Route path="/journal" component={Journal} />
-      <Route path="/visibility" component={Visibility} />
-      <Route path="/resources" component={Resources} />
       <Route component={NotFound} />
     </Switch>
   );

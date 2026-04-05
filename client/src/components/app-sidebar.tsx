@@ -1,11 +1,7 @@
 import {
   LayoutDashboard,
-  Zap,
-  Map,
   Brain,
   BookOpen,
-  Eye,
-  Library,
 } from "lucide-react";
 import { Link, useLocation } from "wouter";
 import {
@@ -22,12 +18,8 @@ import {
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Bootcamp", url: "/bootcamp", icon: Zap },
-  { title: "Roadmap", url: "/roadmap", icon: Map },
   { title: "Skills", url: "/skills", icon: Brain },
   { title: "Journal", url: "/journal", icon: BookOpen },
-  { title: "Visibility", url: "/visibility", icon: Eye },
-  { title: "Resources", url: "/resources", icon: Library },
 ];
 
 function LogoMark() {
@@ -64,7 +56,7 @@ export function AppSidebar() {
           <LogoMark />
           <div className="flex flex-col group-data-[collapsible=icon]:hidden">
             <span className="text-sm font-bold tracking-tight text-foreground">AI Cockpit</span>
-            <span className="text-[10px] text-muted-foreground leading-tight">Engineering Roadmap</span>
+            <span className="text-[10px] text-muted-foreground leading-tight">Personal AI Coach</span>
           </div>
         </Link>
       </SidebarHeader>
